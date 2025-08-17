@@ -1,204 +1,180 @@
 # Customers Feature
 
-This feature provides functionality to manage customers using the Customer schema via GraphQL API.
+This feature provides complete customer management functionality using the Customer schema via GraphQL API.
 
-## Schema Integration
+## Features
 
-The customer feature integrates with your Customer schema:
-- **Collection Name**: "Customers"
-- **Schema Name**: "Customer"
-- **Fields**: 
-  - Name (String)
-  - NetWorth (Float)
-- **Project Key**: "659C34D805F84648BE5A4C89C7EEBBAC"
-- **API Type**: GraphQL
+- ✅ **Add Customer**: Create new customers using the Customer schema
+- ✅ **List Customers**: View all customers from the GraphQL API
+- ✅ **Update Customer**: Modify existing customer information
+- ✅ **Delete Customer**: Remove customers from the system
+- ✅ **Access Token Management**: Automatic token retrieval with cookie priority
 
-## GraphQL Configuration
+## Access Token Configuration
+
+The system automatically retrieves access tokens with the following priority:
+
+1. **Cookies (Priority 1)**: Looks for access token in the primary cookie:
+   - **Primary**: `access_token_659C34D805F84648BE5A4C89C7EEBBAC` (project-specific)
+
+2. **Environment Variable (Priority 2)**: Falls back to `REACT_APP_GRAPHQL_API_KEY`
+
+3. **No Token**: If neither source is available, uses empty string
+
+### Cookie Naming Convention
+
+The primary access token cookie follows this pattern:
+```
+access_token_{PROJECT_KEY}
+```
+
+For your project, the cookie name is:
+```
+access_token_659C34D805F84648BE5A4C89C7EEBBAC
+```
+
+This naming convention ensures that:
+- Each project has its own unique access token cookie
+- No conflicts between different projects
+- Clear identification of token source
+- Secure token isolation
 
 ### Environment Variables
 
-Set these environment variables in your `.env` file:
-
 ```bash
-# GraphQL API endpoint
-REACT_APP_GRAPHQL_API_URL=https://your-api-domain.com/graphql
+# GraphQL API URL
+REACT_APP_GRAPHQL_API_URL=https://api.seliseblocks.com/graphql/v1/graphql
 
-# API Key for authentication (if required)
-REACT_APP_GRAPHQL_API_KEY=your-api-key-here
-```
+# Fallback API Key (used if no cookie token found)
+REACT_APP_GRAPHQL_API_KEY=your_api_key_here
 
-### API Endpoints
-
-The feature expects these GraphQL operations to be available:
-
-1. **Query Customers**: `querySchema` operation
-2. **Create Customer**: `createSchemaItem` mutation
-3. **Update Customer**: `updateSchemaItem` mutation
-4. **Delete Customer**: `deleteSchemaItem` mutation
-
-### GraphQL Schema Requirements
-
-Your GraphQL schema should support these operations:
-
-```graphql
-type Query {
-  querySchema(
-    collectionName: String!
-    schemaName: String!
-    projectKey: String!
-    limit: Int
-    offset: Int
-  ): SchemaQueryResult
-}
-
-type Mutation {
-  createSchemaItem(
-    collectionName: String!
-    schemaName: String!
-    projectKey: String!
-    data: CustomerInput!
-  ): Customer
-  
-  updateSchemaItem(
-    collectionName: String!
-    schemaName: String!
-    projectKey: String!
-    id: String!
-    data: CustomerInput!
-  ): Customer
-  
-  deleteSchemaItem(
-    collectionName: String!
-    schemaName: String!
-    projectKey: String!
-    id: String!
-  ): DeleteResult
-}
-
-input CustomerInput {
-  name: String!
-  netWorth: Float!
-}
-
-type Customer {
-  id: String!
-  name: String!
-  netWorth: Float!
-  createdAt: String!
-  updatedAt: String!
-}
-
-type SchemaQueryResult {
-  data: [Customer!]!
-  totalCount: Int!
-  hasMore: Boolean!
-}
-
-type DeleteResult {
-  success: Boolean!
-  message: String!
-}
+# Blocks Key (required for all requests)
+REACT_APP_BLOCKS_KEY=659C34D805F84648BE5A4C89C7EEBBAC
 ```
 
 ## Components
 
 ### AddCustomerForm
-A modal dialog component for adding new customers with the following fields:
-- **Name** (String, required): Customer's name
-- **Net Worth** (Float, required): Customer's net worth value
+Modal form for adding new customers with validation.
 
-### CustomersPage
-The main customer management page that displays:
-- Customer list from GraphQL schema
-- Add customer functionality
-- Loading states
-- Error handling
-- Empty state with call-to-action
-- Refresh button to reload data
+**Props:**
+- `open`: Boolean to control modal visibility
+- `onOpenChange`: Callback for modal state changes
+- `onSubmit`: Function called when form is submitted
 
-## Features
+### AccessTokenStatus
+Debug component showing current access token status and source.
 
-- **GraphQL Integration**: Uses GraphQL for all CRUD operations
-- **Form Validation**: Uses Zod schema validation
-- **React Hook Form**: Modern form state management
-- **Responsive Design**: Works on both desktop and mobile
-- **Translation Support**: Uses i18n with fallbacks
-- **Error Handling**: Proper error states and user feedback
-- **Loading States**: Shows loading indicators during operations
-- **Real-time Data**: Fetches data from your actual Customer schema
+**Features:**
+- Real-time token status monitoring
+- Token source identification (Cookie vs Environment Variable)
+- Token preview (truncated for security)
+- Manual refresh capability
 
-## Usage
+## Hooks
 
-The customer feature is accessible through the sidebar navigation:
-1. Navigate to the "Customers" section in the sidebar
-2. Click "Add Customer" to open the form
-3. Fill in customer name and net worth
-4. Submit to create a new customer using GraphQL
-5. Use the refresh button to reload customer data
+### useCustomers
+Manages customer data and operations.
 
-## Files Structure
+**Returns:**
+- `customers`: Array of customer objects
+- `isLoading`: Loading state
+- `error`: Error message if any
+- `addCustomer`: Function to add new customer
+- `fetchCustomers`: Function to refresh customer list
+- `refreshCustomers`: Function to refresh data
+- `updateCustomer`: Function to update existing customer
+- `deleteCustomer`: Function to delete customer
 
+### useAccessToken
+Monitors access token status and changes.
+
+**Returns:**
+- `token`: Current access token
+- `isValid`: Whether token is valid
+- `hasToken`: Whether any token is available
+- `refreshToken`: Function to manually refresh token status
+
+## Utilities
+
+### getCurrentAccessToken()
+Returns the current access token with fallback priority.
+
+### hasValidAccessToken()
+Checks if a valid access token is available.
+
+### getAccessTokenFromCookies()
+Retrieves access token from cookies only.
+
+## GraphQL Operations
+
+### Queries
+- `GET_CUSTOMERS`: Fetch all customers with pagination
+- `GET_CUSTOMER_BY_ID`: Get specific customer by ID
+- `SEARCH_CUSTOMERS`: Search customers with filters
+
+### Mutations
+- `CREATE_CUSTOMER`: Add new customer
+- `UPDATE_CUSTOMER`: Modify existing customer
+- `DELETE_CUSTOMER`: Remove customer
+
+## Usage Example
+
+```tsx
+import { useCustomers, useAccessToken } from 'features/customers';
+
+function MyComponent() {
+  const { customers, addCustomer, isLoading } = useCustomers();
+  const { token, isValid, hasToken } = useAccessToken();
+
+  const handleAddCustomer = async (customerData) => {
+    if (!hasToken) {
+      console.error('No access token available');
+      return;
+    }
+    
+    try {
+      await addCustomer(customerData);
+      console.log('Customer added successfully');
+    } catch (error) {
+      console.error('Failed to add customer:', error);
+    }
+  };
+
+  return (
+    <div>
+      <p>Token Status: {isValid ? 'Valid' : 'Invalid'}</p>
+      <p>Token Source: {token ? 'Available' : 'Not Available'}</p>
+      
+      {customers.map(customer => (
+        <div key={customer.ItemId}>
+          {customer.FirstName} {customer.LastName}
+        </div>
+      ))}
+    </div>
+  );
+}
 ```
-src/features/customers/
-├── components/
-│   └── add-customer-form/
-│       ├── add-customer-form.tsx
-│       └── index.tsx
-├── config/
-│   └── api.config.ts          # GraphQL API configuration
-├── graphql/
-│   ├── client.ts              # GraphQL client utility
-│   ├── queries.ts             # GraphQL queries
-│   ├── mutations.ts           # GraphQL mutations
-│   └── index.ts               # GraphQL exports
-├── hooks/
-│   └── use-customers.ts       # Customer operations hook
-├── services/
-│   └── customer.service.ts    # GraphQL service layer
-├── index.tsx                  # Main exports
-└── README.md                  # This file
-```
 
-## Integration Points
+## API Configuration
 
-- **Sidebar Menu**: Added to the "Customer Relationship Management" section
-- **Routing**: Accessible at `/customers`
-- **Navigation**: Integrated with the main application navigation
-- **Breadcrumbs**: Proper breadcrumb support
-- **Translation**: Route module mapping for i18n
-- **GraphQL**: Full CRUD operations via GraphQL API
+The system automatically configures GraphQL requests with:
+- Correct API endpoint
+- Authentication headers (Bearer token)
+- Blocks key header
+- Content-Type headers
 
-## API Integration
+## Error Handling
 
-The service layer is designed to work with your Customer schema via GraphQL:
-- `createCustomer()`: Creates new customers using GraphQL mutation
-- `getCustomers()`: Retrieves customer list using GraphQL query
-- `updateCustomer()`: Updates existing customers using GraphQL mutation
-- `deleteCustomer()`: Deletes customers using GraphQL mutation
+All GraphQL operations include comprehensive error handling:
+- Network errors
+- GraphQL errors
+- Validation errors
+- User-friendly error messages
 
-## Customization
+## Security Features
 
-### Update GraphQL Operations
-
-If your GraphQL schema uses different operation names, update the files in `src/features/customers/graphql/`:
-
-1. **queries.ts**: Update query names and structure
-2. **mutations.ts**: Update mutation names and structure
-3. **client.ts**: Modify error handling or response processing
-
-### Update API Configuration
-
-Modify `src/features/customers/config/api.config.ts` to:
-- Change the GraphQL endpoint
-- Update authentication method
-- Modify default query parameters
-
-## Future Enhancements
-
-- Customer editing functionality
-- Customer deletion with confirmation
-- Advanced filtering and search
-- Customer analytics and reporting
-- Bulk operations
-- Customer categories and tags
-- Real-time updates via GraphQL subscriptions 
+- Token preview truncation (shows only first/last 10 characters)
+- Secure cookie parsing
+- Environment variable fallback
+- No token logging in production 

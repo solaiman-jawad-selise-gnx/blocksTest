@@ -16,6 +16,5 @@ const createMenuItem = (
 
 export const menuItems: MenuItem[] = [
   createMenuItem('iam', 'IAM', '/identity-management', 'Users', { isIntegrated: true }),
-  createMenuItem('inventory', 'INVENTORY', '/inventory', 'Store', { isIntegrated: true }),
-  createMenuItem('customers', 'CUSTOMERS', '/customers', 'User', { isIntegrated: true }),
+  createMenuItem('customers', 'customers', '/customers', 'User', { isIntegrated: true }),
 ];

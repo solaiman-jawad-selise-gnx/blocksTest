@@ -17,8 +17,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 // Customer form validation schema
 const customerFormSchema = z.object({
-  name: z.string().min(1, { message: 'NAME_REQUIRED' }),
-  netWorth: z.number().min(0, { message: 'NET_WORTH_MUST_BE_POSITIVE' }),
+  FirstName: z.string().min(1, { message: 'FIRST_NAME_REQUIRED' }),
+  LastName: z.string().min(1, { message: 'LAST_NAME_REQUIRED' }),
+  NetWorth: z.number().min(0, { message: 'NET_WORTH_MUST_BE_POSITIVE' }),
 });
 
 type CustomerFormValues = z.infer<typeof customerFormSchema>;
@@ -36,8 +37,9 @@ export function AddCustomerForm({ open, onOpenChange, onSubmit }: AddCustomerFor
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
-      name: '',
-      netWorth: 0,
+      FirstName: '',
+      LastName: '',
+      NetWorth: 0,
     },
   });
 
@@ -79,13 +81,13 @@ export function AddCustomerForm({ open, onOpenChange, onSubmit }: AddCustomerFor
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="name"
+              name="FirstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{getTranslation('CUSTOMER_NAME', 'Customer Name')}*</FormLabel>
+                  <FormLabel>{getTranslation('FIRST_NAME', 'First Name')}*</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={getTranslation('ENTER_CUSTOMER_NAME', 'Enter customer name')}
+                      placeholder={getTranslation('ENTER_FIRST_NAME', 'Enter first name')}
                       {...field}
                     />
                   </FormControl>
@@ -96,7 +98,24 @@ export function AddCustomerForm({ open, onOpenChange, onSubmit }: AddCustomerFor
             
             <FormField
               control={form.control}
-              name="netWorth"
+              name="LastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{getTranslation('LAST_NAME', 'Last Name')}*</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={getTranslation('ENTER_LAST_NAME', 'Enter last name')}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="NetWorth"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{getTranslation('NET_WORTH', 'Net Worth')}*</FormLabel>

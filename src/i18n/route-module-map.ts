@@ -10,8 +10,5 @@
  */
 export const routeModuleMap: Record<string, string[]> = {
   '/identity-management': ['common', 'iam'],
-  '/inventory': ['common', 'inventory'],
   '/customers': ['common', 'customers'],
-  '/404': ['common', 'error'],
-  '/503': ['common', 'error'],
 };

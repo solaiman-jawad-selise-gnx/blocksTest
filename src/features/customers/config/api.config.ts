@@ -1,41 +1,31 @@
-// Configuration for Customer Schema GraphQL API
-// Update these URLs to match your actual GraphQL API endpoint
+import { getCurrentAccessToken } from '../utils/auth.utils';
 
-export const CUSTOMER_API_CONFIG = {
-  // Base URL for your GraphQL API
-  GRAPHQL_URL: process.env.REACT_APP_GRAPHQL_API_URL || '/graphql',
-  
-  // Your project key from the Customer schema
-  PROJECT_KEY: '659C34D805F84648BE5A4C89C7EEBBAC',
-  
-  // Collection and schema names
-  COLLECTION_NAME: 'Customers',
-  SCHEMA_NAME: 'Customer',
-  
-  // Authentication
-  AUTH: {
-    HEADER_NAME: 'Authorization',
-    TOKEN_PREFIX: 'Bearer',
-    API_KEY: process.env.REACT_APP_GRAPHQL_API_KEY || '',
-  },
-  
-  // Query defaults
-  QUERY_DEFAULTS: {
-    LIMIT: 100,
-    OFFSET: 0,
-  },
+// Configuration for Customer Schema GraphQL API - SeliseBlocks
+// Based on Postman collection: https://api.seliseblocks.com/graphql/v1/graphql
+
+export const GRAPHQL_URL = process.env.REACT_APP_GRAPHQL_API_URL || 'https://api.seliseblocks.com/graphql/v1/graphql';
+
+export const AUTH = {
+  TOKEN_PREFIX: 'bearer',
+  TOKEN: getCurrentAccessToken(),
+  BLOCKS_KEY_HEADER: 'x-blocks-key',
+  BLOCKS_KEY: process.env.REACT_APP_BLOCKS_KEY || '659C34D805F84648BE5A4C89C7EEBBAC',
 };
 
-// Helper function to get auth headers
-export const getAuthHeaders = (): Record<string, string> => {
-  const headers: Record<string, string> = {
+export const QUERY_DEFAULTS = {
+  PAGE_NO: 1,
+  PAGE_SIZE: 10,
+  FILTER: '{}',
+  SORT: '{}',
+};
+
+export const getAuthHeaders = () => {
+  // Get fresh token each time (in case it was updated)
+  const currentToken = getCurrentAccessToken();
+  
+  return {
     'Content-Type': 'application/json',
+    [AUTH.BLOCKS_KEY_HEADER]: AUTH.BLOCKS_KEY,
+    'Authorization': `${AUTH.TOKEN_PREFIX} ${currentToken}`,
   };
-
-  if (CUSTOMER_API_CONFIG.AUTH.API_KEY) {
-    headers[CUSTOMER_API_CONFIG.AUTH.HEADER_NAME] = 
-      `${CUSTOMER_API_CONFIG.AUTH.TOKEN_PREFIX} ${CUSTOMER_API_CONFIG.AUTH.API_KEY}`;
-  }
-
-  return headers;
 };

@@ -1,50 +1,30 @@
-import { useEffect } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useLanguageContext, LanguageProvider } from './i18n/language-context';
 import { LoadingOverlay } from './components/core/loading-overlay';
 import './i18n/i18n';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'components/ui/toaster';
-import { ClientMiddleware } from 'state/client-middleware';
-import MainLayout from 'pages/main/main-layout';
+import { ThemeProvider } from './styles/theme/theme-provider';
+import { SidebarProvider } from './components/ui/sidebar';
+import { Toaster } from './components/ui/toaster';
+import { ClientMiddleware } from './state/client-middleware';
 import { AuthLayout } from './pages/auth/auth-layout';
-import { SigninPage } from 'pages/auth/signin/signin-page';
-import { SignupPage } from 'pages/auth/signup/signup-page';
-import { EmailVerification } from 'pages/auth/email-verification/email-verification';
+import { SigninPage } from './pages/auth/signin/signin-page';
+import { SignupPage } from './pages/auth/signup/signup-page';
+import { ForgotPasswordPage } from './pages/auth/forgot-password/forgot-password';
+import { ResetPasswordPage } from './pages/auth/reset-password/reset-password';
 import { SetPasswordPage } from './pages/auth/set-password/set-password';
+import { EmailVerification } from './pages/auth/email-verification/email-verification';
+import { VerifyOtpKey } from './pages/auth/verify-otp-key/verify-otp-key';
 import { ActivationSuccess } from './pages/auth/activation-success/activation-success';
 import { VerificationFailed } from './pages/auth/verification-failed/verification-failed';
-import { ResetPasswordPage } from './pages/auth/reset-password/reset-password';
-import { ForgotPasswordPage } from './pages/auth/forgot-password/forgot-password';
-import TaskPage from './pages/main/iam-table';
-import { ThemeProvider } from 'styles/theme/theme-provider';
-import { Inventory } from './pages/inventory/inventory';
-import { InventoryDetails } from './pages/inventory/inventory-details';
-import { SidebarProvider } from 'components/ui/sidebar';
-import { VerifyOtpKey } from './pages/auth/verify-otp-key/verify-otp-key';
-import { InventoryForm } from './features/inventory/component/inventory-form/inventory-form';
-import ServiceUnavailable from './pages/error/service-unavailable/service-unavailable';
-import NotFound from './pages/error/not-found/not-found';
+import MainLayout from './pages/main/main-layout';
+import IamTable from './pages/main/iam-table';
 import CustomersPage from './pages/customers/customers';
+import NotFound from './pages/error/not-found/not-found';
+import ServiceUnavailable from './pages/error/service-unavailable/service-unavailable';
 
 const queryClient = new QueryClient();
-
-function RedirectHandler() {
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.pathname === '/success') {
-      const headers = new Headers();
-      headers.set('x-current-path', location.pathname);
-
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 10000);
-    }
-  }, [location]);
-
-  return null;
-}
 
 function AppContent() {
   const { isLoading } = useLanguageContext();
@@ -55,35 +35,35 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background font-sans antialiased relative">
-      <RedirectHandler />
       <ClientMiddleware>
         <ThemeProvider>
           <SidebarProvider>
             <Routes>
-              <Route element={<AuthLayout />}>
-                <Route path="/login" element={<SigninPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/sent-email" element={<EmailVerification />} />
-                <Route path="/activate" element={<SetPasswordPage />} />
-                <Route path="/resetpassword" element={<ResetPasswordPage />} />
-                <Route path="/success" element={<ActivationSuccess />} />
-                <Route path="/activate-failed" element={<VerificationFailed />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/verify-key" element={<VerifyOtpKey />} />
-              </Route>
-              <Route element={<MainLayout />}>
-                <Route path="/inventory" element={<Inventory />} />
-                <Route path="/inventory/add" element={<InventoryForm />} />
-                <Route path="/inventory/:itemId" element={<InventoryDetails />} />
-                <Route path="/identity-management" element={<TaskPage />} />
-                <Route path="/customers" element={<CustomersPage />} />
-                <Route path="/503" element={<ServiceUnavailable />} />
-                <Route path="/404" element={<NotFound />} />
+              {/* Auth Routes */}
+              <Route path="/auth" element={<AuthLayout />}>
+                <Route index element={<Navigate to="/auth/signin" replace />} />
+                <Route path="signin" element={<SigninPage />} />
+                <Route path="signup" element={<SignupPage />} />
+                <Route path="forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="reset-password" element={<ResetPasswordPage />} />
+                <Route path="set-password" element={<SetPasswordPage />} />
+                <Route path="email-verification" element={<EmailVerification />} />
+                <Route path="verify-otp-key" element={<VerifyOtpKey />} />
+                <Route path="activation-success" element={<ActivationSuccess />} />
+                <Route path="verification-failed" element={<VerificationFailed />} />
               </Route>
 
-              {/* redirecting */}
-              <Route path="/" element={<Navigate to="/inventory" />} />
-              <Route path="*" element={<Navigate to="/404" />} />
+              {/* Main Routes */}
+              <Route path="/" element={<MainLayout />}>
+                <Route index element={<Navigate to="/customers" replace />} />
+                <Route path="identity-management" element={<IamTable />} />
+                <Route path="customers" element={<CustomersPage />} />
+              </Route>
+
+              {/* Error Routes */}
+              <Route path="/404" element={<NotFound />} />
+              <Route path="/503" element={<ServiceUnavailable />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
             </Routes>
           </SidebarProvider>
         </ThemeProvider>
@@ -95,13 +75,13 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <QueryClientProvider client={queryClient}>
         <LanguageProvider defaultLanguage="en-US" defaultModules={['common', 'auth']}>
           <AppContent />
         </LanguageProvider>
       </QueryClientProvider>
-    </BrowserRouter>
+    </Router>
   );
 }
 

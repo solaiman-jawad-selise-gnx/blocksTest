@@ -48,7 +48,15 @@ export const useCustomers = () => {
     setError(null);
     
     try {
-      await updateCustomer(customerId, customerData);
+      // Create a complete customer object with the ItemId and updated data
+      const updatedCustomer: Customer = {
+        ItemId: customerId,
+        FirstName: customerData.FirstName || '',
+        LastName: customerData.LastName || '',
+        NetWorth: customerData.NetWorth || 0,
+      };
+      
+      await updateCustomer(updatedCustomer);
       
       // Refresh the customer list to show updated data
       await fetchCustomers();
@@ -69,7 +77,7 @@ export const useCustomers = () => {
       await deleteCustomer(customerId);
       
       // Remove the customer from local state
-      setCustomers(prev => prev.filter(customer => customer.id !== customerId));
+      setCustomers(prev => prev.filter(customer => customer.ItemId !== customerId));
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete customer');
