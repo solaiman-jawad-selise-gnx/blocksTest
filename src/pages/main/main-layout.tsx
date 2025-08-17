@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { Bell, Library } from 'lucide-react';
 import { AppSidebar } from '../../components/blocks/layout/app-sidebar';
 import { UProfileMenu } from '../../components/blocks/u-profile-menu';
@@ -11,11 +11,6 @@ import { useGetNotifications } from 'features/notification/hooks/use-notificatio
 
 export default function MainLayout() {
   const { open, isMobile } = useSidebar();
-  const { pathname } = useLocation();
-  const segments = pathname?.split('/').filter(Boolean);
-  const firstSegment = segments?.[0] ?? undefined;
-  const isEmailRoute = firstSegment === 'mail';
-  const isChatRoute = firstSegment === 'chat';
   const { data: notificationsData } = useGetNotifications({
     Page: 0,
     PageSize: 10,
@@ -64,7 +59,7 @@ export default function MainLayout() {
                       <Bell className="!w-5 !h-5 text-medium-emphasis" />
                     </Button>
                     {notifications.unReadNotificationsCount > 0 && (
-                      <div className="w-2 h-2 bg-error rounded-full absolute top-[13px] right-[20px]" />
+                      <div className="w-2 bg-error rounded-full absolute top-[13px] right-[20px]" />
                     )}
                   </div>
                 </MenubarTrigger>
@@ -76,7 +71,7 @@ export default function MainLayout() {
           </div>
         </div>
         <div
-          className={`flex h-full bg-surface ${!isEmailRoute && !isChatRoute && 'p-4 sm:p-6 md:p-8'} ${open && !isMobile ? 'w-[calc(100dvw-var(--sidebar-width))]' : 'w-full'}`}
+          className={`flex h-full bg-surface p-4 sm:p-6 md:p-8 ${open && !isMobile ? 'w-[calc(100dvw-var(--sidebar-width))]' : 'w-full'}`}
         >
           <Outlet />
         </div>

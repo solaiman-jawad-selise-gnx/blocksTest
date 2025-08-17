@@ -3,7 +3,7 @@ import { menuItems } from '../constant/sidebar-menu';
 describe('menuItems', () => {
   test('should have the correct structure', () => {
     expect(Array.isArray(menuItems)).toBe(true);
-    expect(menuItems.length).toBe(14);
+    expect(menuItems.length).toBe(3);
   });
 
   test('each menu item should have required properties', () => {
@@ -19,20 +19,6 @@ describe('menuItems', () => {
     });
   });
 
-  test('dashboard item should have correct values', () => {
-    const dashboardItem = menuItems.find((item) => item.id === 'dashboard');
-    expect(dashboardItem).toBeDefined();
-    expect(dashboardItem).toEqual({
-      id: 'dashboard',
-      name: 'DASHBOARD',
-      path: '/dashboard',
-      icon: 'LayoutDashboard',
-    });
-    if (dashboardItem) {
-      expect(dashboardItem.isIntegrated).toBeUndefined();
-    }
-  });
-
   test('IAM item should be integrated', () => {
     const iamItem = menuItems.find((item) => item.id === 'iam');
     expect(iamItem).toBeDefined();
@@ -43,6 +29,32 @@ describe('menuItems', () => {
       expect(iamItem.name).toBe('IAM');
       expect(iamItem.path).toBe('/identity-management');
       expect(iamItem.icon).toBe('Users');
+    }
+  });
+
+  test('Inventory item should be integrated', () => {
+    const inventoryItem = menuItems.find((item) => item.id === 'inventory');
+    expect(inventoryItem).toBeDefined();
+    if (inventoryItem) {
+      expect(inventoryItem.isIntegrated).toBe(true);
+    }
+    if (inventoryItem) {
+      expect(inventoryItem.name).toBe('INVENTORY');
+      expect(inventoryItem.path).toBe('/inventory');
+      expect(inventoryItem.icon).toBe('Store');
+    }
+  });
+
+  test('Customers item should be integrated', () => {
+    const customersItem = menuItems.find((item) => item.id === 'customers');
+    expect(customersItem).toBeDefined();
+    if (customersItem) {
+      expect(customersItem.isIntegrated).toBe(true);
+    }
+    if (customersItem) {
+      expect(customersItem.name).toBe('CUSTOMERS');
+      expect(customersItem.path).toBe('/customers');
+      expect(customersItem.icon).toBe('User');
     }
   });
 
