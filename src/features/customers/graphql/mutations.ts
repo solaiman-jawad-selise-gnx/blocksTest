@@ -3,7 +3,7 @@
 export const CUSTOMER_MUTATIONS = {
   // Mutation to create a new customer - matches Postman collection format exactly
   CREATE_CUSTOMER: `
-    mutation {
+    mutation CreateCustomer($firstName: String!, $lastName: String!, $netWorth: Float!) {
       insertCustomer(input: {
         FirstName: $firstName
         LastName: $lastName

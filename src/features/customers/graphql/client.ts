@@ -14,21 +14,18 @@ interface GraphQLResponse<T = any> {
 
 export class GraphQLClient {
   private baseURL: string;
-  private headers: Record<string, string>;
+  private getHeaders: () => Record<string, string>;
 
-  constructor(baseURL: string, headers: Record<string, string> = {}) {
+  constructor(baseURL: string, getHeaders: () => Record<string, string>) {
     this.baseURL = baseURL;
-    this.headers = {
-      'Content-Type': 'application/json',
-      ...headers,
-    };
+    this.getHeaders = getHeaders;
   }
 
   async query<T = any>(request: GraphQLRequest): Promise<GraphQLResponse<T>> {
     try {
       const response = await fetch(this.baseURL, {
         method: 'POST',
-        headers: this.headers,
+        headers: this.getHeaders(),
         body: JSON.stringify(request),
       });
 
@@ -47,7 +44,7 @@ export class GraphQLClient {
     try {
       const response = await fetch(this.baseURL, {
         method: 'POST',
-        headers: this.headers,
+        headers: this.getHeaders(),
         body: JSON.stringify(request),
       });
 
