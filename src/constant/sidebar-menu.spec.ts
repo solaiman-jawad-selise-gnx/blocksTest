@@ -15,7 +15,7 @@ describe('sidebar-menu', () => {
   it('should have customers menu item', () => {
     const customersItem = menuItems.find(item => item.id === 'customers');
     expect(customersItem).toBeDefined();
-    expect(customersItem?.name).toBe('customers');
+    expect(customersItem?.name).toBe('Customers');
     expect(customersItem?.path).toBe('/customers');
   });
 });

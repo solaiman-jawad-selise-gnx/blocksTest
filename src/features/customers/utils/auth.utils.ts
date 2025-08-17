@@ -38,3 +38,20 @@ export const hasValidAccessToken = (): boolean => {
   const token = getCurrentAccessToken();
   return token.length > 0;
 };
+
+// Function to get cookie access information for debugging
+export const getCookieAccessInfo = () => {
+  const projectKey = '659C34D805F84648BE5A4C89C7EEBBAC';
+  const specificCookieName = `access_token_${projectKey}`;
+  const currentDomain = window.location.hostname;
+  
+  return {
+    cookieName: specificCookieName,
+    currentDomain,
+    targetDomain: '.seliseblocks.com',
+    isCrossDomain: currentDomain !== 'seliseblocks.com' && !currentDomain.endsWith('.seliseblocks.com'),
+    availableCookies: document.cookie ? document.cookie.split(';').map(c => c.trim().split('=')[0]) : [],
+    cookieFound: getCookie(specificCookieName) !== null,
+    cookieValue: getCookie(specificCookieName),
+  };
+};

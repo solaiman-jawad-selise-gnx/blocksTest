@@ -1,15 +1,16 @@
 import React from 'react';
 import { useAccessToken } from '../../hooks/use-access-token';
-import { getAccessTokenFromCookies, getCookie } from '../../utils/auth.utils';
+import { getAccessTokenFromCookies, getCookie, getCookieAccessInfo } from '../../utils/auth.utils';
 import { Badge } from 'components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
-import { RefreshCw, Key, Cookie, Settings } from 'lucide-react';
+import { RefreshCw, Key, Cookie, Settings, AlertTriangle } from 'lucide-react';
 import { Button } from 'components/ui/button';
 
 export const AccessTokenStatus: React.FC = () => {
   const { token, isValid, refreshToken } = useAccessToken();
   const cookieToken = getAccessTokenFromCookies();
   const envToken = process.env.REACT_APP_GRAPHQL_API_KEY;
+  const cookieInfo = getCookieAccessInfo();
   
   // Get the specific cookie name being checked
   const projectKey = '659C34D805F84648BE5A4C89C7EEBBAC';
@@ -64,6 +65,51 @@ export const AccessTokenStatus: React.FC = () => {
             {getTokenPreview(token)}
           </div>
         </div>
+
+        {/* Cookie Access Information */}
+        <div className="space-y-2">
+          <div className="text-sm font-medium">Cookie Access Info:</div>
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center justify-between">
+              <span>Cookie Name:</span>
+              <span className="font-mono">{cookieInfo.cookieName}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Current Domain:</span>
+              <span className="font-mono">{cookieInfo.currentDomain}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Target Domain:</span>
+              <span className="font-mono">{cookieInfo.targetDomain}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Cross-Domain:</span>
+              <Badge variant={cookieInfo.isCrossDomain ? "destructive" : "default"}>
+                {cookieInfo.isCrossDomain ? "Yes" : "No"}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Cookie Found:</span>
+              <Badge variant={cookieInfo.cookieFound ? "default" : "secondary"}>
+                {cookieInfo.cookieFound ? "Yes" : "No"}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Cross-Domain Warning */}
+        {cookieInfo.isCrossDomain && (
+          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-center gap-2 text-yellow-800">
+              <AlertTriangle className="h-4 w-4" />
+              <span className="text-sm font-medium">Cross-Domain Cookie Access</span>
+            </div>
+            <p className="text-xs text-yellow-700 mt-1">
+              The access token cookie is set for {cookieInfo.targetDomain} but you&apos;re accessing from {cookieInfo.currentDomain}. 
+              This may prevent cookie access due to browser security restrictions.
+            </p>
+          </div>
+        )}
 
         <div className="space-y-2">
           <div className="text-sm font-medium">Available Sources:</div>

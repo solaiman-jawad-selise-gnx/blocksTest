@@ -39,6 +39,26 @@ This naming convention ensures that:
 - Clear identification of token source
 - Secure token isolation
 
+### Cross-Domain Cookie Access
+
+**Important**: The access token cookie is set for the domain `.seliseblocks.com`. If you're running the application from a different domain (e.g., `localhost` during development), you may not be able to access this cookie due to browser security restrictions.
+
+**Cookie Details**:
+- **Name**: `access_token_659C34D805F84648BE5A4C89C7EEBBAC`
+- **Domain**: `.seliseblocks.com`
+- **Path**: `/`
+
+**Solutions**:
+1. **Use Environment Variable**: Set `REACT_APP_GRAPHQL_API_KEY` in your `.env` file for local development
+2. **Deploy to Same Domain**: Deploy your application to a subdomain of `seliseblocks.com`
+3. **Proxy Setup**: Configure a proxy to forward requests to the API while maintaining cookie context
+4. **Token Transfer**: Implement a mechanism to transfer the token from the cookie domain to your application domain
+
+**Development Workflow**:
+1. Set `REACT_APP_GRAPHQL_API_KEY` in your `.env` file
+2. The system will automatically fall back to the environment variable when cookies are not accessible
+3. Use the AccessTokenStatus component to monitor token availability and source
+
 ### Environment Variables
 
 ```bash
