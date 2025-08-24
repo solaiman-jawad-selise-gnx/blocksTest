@@ -1,183 +1,109 @@
 # GraphQL API Configuration Guide - SeliseBlocks
 
-## Environment Variables Setup
+## Overview
 
 To configure the Customer feature to work with your SeliseBlocks GraphQL API, you need to set up environment variables in your project root.
 
-### 1. Create Environment File
+## Environment Variables
 
-In your project root directory, create a `.env` file (or `.env.local` for local development):
-
-```bash
-# Customer Feature GraphQL API Configuration - SeliseBlocks
-
-# GraphQL API endpoint URL (defaults to SeliseBlocks API)
-REACT_APP_GRAPHQL_API_URL=https://api.seliseblocks.com/graphql/v1/graphql
-
-# API Key for authentication (Bearer token from your Postman collection)
-REACT_APP_GRAPHQL_API_KEY=your-bearer-token-here
-```
-
-### 2. Environment Variable Details
+### Required Variables
 
 | Variable | Description | Required | Example |
 |----------|-------------|----------|---------|
-| `REACT_APP_GRAPHQL_API_URL` | Full URL to your GraphQL endpoint | No* | `https://api.seliseblocks.com/graphql/v1/graphql` |
-| `REACT_APP_GRAPHQL_API_KEY` | Bearer token for authentication | Yes | `eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...` |
+| `REACT_APP_API_BASE_URL` | Base URL for your API | Yes | `https://api.seliseblocks.com` |
+| `REACT_APP_BLOCKS_KEY` | Blocks key for authentication | Yes | `659C34D805F84648BE5A4C89C7EEBBAC` |
 
-*Defaults to SeliseBlocks API if not provided
+### Optional Variables
 
-### 3. Important Notes
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `REACT_APP_GRAPHQL_URL` | Full GraphQL endpoint URL | No | `${REACT_APP_API_BASE_URL}/graphql/v1/graphql` |
 
-- **REACT_APP_ prefix**: All environment variables must start with `REACT_APP_` for Create React App to recognize them
-- **No quotes**: Don't wrap values in quotes unless they're part of the actual value
-- **Restart required**: After adding environment variables, restart your development server
-- **Build time**: Environment variables are embedded at build time, not runtime
-- **Authentication**: Uses both `x-blocks-key` header and `Authorization` Bearer token
+## Configuration Examples
 
-### 4. Development vs Production
+### Development Environment
 
-#### Development (.env.local)
 ```bash
-REACT_APP_GRAPHQL_API_URL=https://api.seliseblocks.com/graphql/v1/graphql
-REACT_APP_GRAPHQL_API_KEY=your-dev-bearer-token
+# .env.development
+REACT_APP_API_BASE_URL=https://api.seliseblocks.com
+REACT_APP_BLOCKS_KEY=your-dev-blocks-key
 ```
 
-#### Production (.env.production)
+### Production Environment
+
 ```bash
-REACT_APP_GRAPHQL_API_URL=https://api.seliseblocks.com/graphql/v1/graphql
-REACT_APP_GRAPHQL_API_KEY=your-prod-bearer-token
+# .env.production
+REACT_APP_API_BASE_URL=https://api.seliseblocks.com
+REACT_APP_BLOCKS_KEY=your-prod-blocks-key
 ```
 
-### 5. API Endpoint Details
+### Local Development
 
-The feature is configured to work with the SeliseBlocks GraphQL API:
-- **Base URL**: `https://api.seliseblocks.com/graphql/v1/graphql`
-- **Headers**: 
-  - `x-blocks-key`: `659C34D805F84648BE5A4C89C7EEBBAC`
-  - `Authorization`: `bearer {your-token}`
-- **Format**: Matches your Postman collection exactly
-
-### 6. GraphQL Operations
-
-The feature expects these GraphQL operations (matching your Postman collection):
-
-#### Queries:
-- **Get Customers**: `Customers(input: CustomerInput!)`
-- **Get Customer by ID**: `Customer(input: CustomerByIdInput!)`
-
-#### Mutations:
-- **Create Customer**: `insertCustomer(input: CustomerCreateInput!)`
-- **Update Customer**: `updateCustomer(input: CustomerUpdateInput!)`
-- **Delete Customer**: `deleteCustomer(input: CustomerDeleteInput!)`
-
-### 7. Input Types
-
-Based on your Postman collection, the expected input types are:
-
-```graphql
-input CustomerInput {
-  filter: String!    # MongoDB filter in text format
-  sort: String!      # MongoDB sort in text format
-  pageNo: Int!       # Page number
-  pageSize: Int!     # Page size
-}
-
-input CustomerCreateInput {
-  FirstName: String!
-  LastName: String!
-  NetWorth: Float!
-}
-
-input CustomerUpdateInput {
-  ItemId: String!
-  FirstName: String
-  LastName: String
-  NetWorth: Float
-}
-
-input CustomerDeleteInput {
-  ItemId: String!
-}
+```bash
+# .env.local
+REACT_APP_API_BASE_URL=https://api.seliseblocks.com
+REACT_APP_BLOCKS_KEY=your-local-blocks-key
 ```
 
-### 8. Response Format
+## How It Works
 
-The API returns responses in this format:
+The feature is configured to work with the centralized GraphQL client:
 
-```graphql
-type CustomerQueryResult {
-  Customers: {
-    hasNextPage: Boolean!
-    hasPreviousPage: Boolean!
-    totalCount: Int!
-    totalPages: Int!
-    items: [Customer!]!
-  }
-}
+1. **Base URL**: The main API base URL is used to construct the GraphQL endpoint
+2. **Authentication**: The blocks key is automatically included in all requests
+3. **Endpoint**: GraphQL requests are sent to `${baseUrl}/graphql/v1/graphql`
 
-type Customer {
-  ItemId: String!
-  FirstName: String!
-  LastName: String!
-  NetWorth: Float!
-}
+## API Endpoint Structure
 
-type CustomerMutationResult {
-  insertCustomer: {
-    acknowledged: Boolean!
-    itemId: String!
-  }
-}
+```
+Base URL: https://api.seliseblocks.com
+GraphQL Endpoint: https://api.seliseblocks.com/graphql/v1/graphql
 ```
 
-### 9. Testing Configuration
+## Authentication Headers
 
-To test if your configuration is working:
+The centralized GraphQL client automatically includes:
 
-1. Check the browser console for GraphQL requests
-2. Look for network requests to `https://api.seliseblocks.com/graphql/v1/graphql`
-3. Verify both headers are being sent:
-   - `x-blocks-key: 659C34D805F84648BE5A4C89C7EEBBAC`
-   - `Authorization: bearer {your-token}`
+- `Content-Type: application/json`
+- `x-blocks-key: {REACT_APP_BLOCKS_KEY}`
 
-### 10. Troubleshooting
+## Testing Configuration
 
-#### Common Issues:
+To test your configuration:
 
-1. **"GraphQL request failed"**: Check your API URL and ensure the endpoint is accessible
-2. **"GraphQL errors"**: Your GraphQL schema might not match the expected operations
-3. **"Failed to create customer"**: Verify your mutation names and input types
-4. **Authentication errors**: Check your Bearer token and ensure it's valid
+1. Set the required environment variables
+2. Restart your development server
+3. Navigate to the customers page
+4. Check the browser's network tab for GraphQL requests
+5. Verify that requests include the correct headers
 
-#### Debug Steps:
+## Troubleshooting
 
-1. Verify environment variables are loaded:
+### Common Issues
+
+1. **API Key not found**: Check that `REACT_APP_BLOCKS_KEY` is set correctly
+2. **API errors**: Verify `REACT_APP_API_BASE_URL` is correct
+3. **Authentication failures**: Ensure the blocks key is valid
+
+### Debug Steps
+
+1. Check environment variables are loaded:
    ```javascript
-   console.log('API URL:', process.env.REACT_APP_GRAPHQL_API_URL);
-   console.log('API Key:', process.env.REACT_APP_GRAPHQL_API_KEY);
+   console.log('API Base URL:', process.env.REACT_APP_API_BASE_URL);
+   console.log('Blocks Key:', process.env.REACT_APP_BLOCKS_KEY);
    ```
 
-2. Check network tab in browser dev tools for failed requests
+2. Verify GraphQL endpoint construction:
+   ```javascript
+   const endpoint = `${process.env.REACT_APP_API_BASE_URL}/graphql/v1/graphql`;
+   console.log('GraphQL Endpoint:', endpoint);
+   ```
 
-3. Verify your GraphQL schema supports the required operations:
-   - `Customers` query with pagination
-   - `insertCustomer` mutation
-   - `updateCustomer` mutation
-   - `deleteCustomer` mutation
+3. Check network requests in browser dev tools
 
-### 11. Security Considerations
+## Security Notes
 
-- Never commit `.env` files to version control
-- Use different Bearer tokens for development and production
-- Consider using environment-specific configuration files
-- The `x-blocks-key` is automatically included in all requests
-- Implement proper CORS policies on your GraphQL server
-
-### 12. Postman Collection Reference
-
-This configuration is based on your Postman collection:
-- **Collection Name**: `data-gateway`
-- **Base URL**: `https://api.seliseblocks.com/graphql/v1/graphql`
-- **Headers**: `x-blocks-key` and `Authorization: bearer`
-- **Operations**: `insertCustomer` and `Customers` query
+- Never commit environment files with real API keys
+- Use different keys for different environments
+- Rotate keys regularly
+- Monitor API usage for suspicious activity

@@ -40,11 +40,7 @@ export const createCustomer = async (customer: Omit<Customer, 'ItemId'>): Promis
       },
     });
 
-    if (result.errors && result.errors.length > 0) {
-      throw new Error(result.errors.map((e: { message: string }) => e.message).join(', '));
-    }
-
-    return result.data?.insertCustomer || { acknowledged: false, itemId: '' };
+    return result.insertCustomer || { acknowledged: false, itemId: '' };
   } catch (error) {
     throw new Error(`Failed to create customer: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -56,11 +52,7 @@ export const getCustomers = async (): Promise<Customer[]> => {
       query: CUSTOMER_QUERIES.GET_CUSTOMERS,
     });
 
-    if (result.errors && result.errors.length > 0) {
-      throw new Error(result.errors.map((e: { message: string }) => e.message).join(', '));
-    }
-
-    return result.data?.Customers?.items || [];
+    return result.Customers?.items || [];
   } catch (error) {
     throw new Error(`Failed to fetch customers: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -78,11 +70,7 @@ export const updateCustomer = async (customer: Customer): Promise<CustomerRespon
       },
     });
 
-    if (result.errors && result.errors.length > 0) {
-      throw new Error(result.errors.map((e: { message: string }) => e.message).join(', '));
-    }
-
-    return result.data?.updateCustomer || { acknowledged: false, itemId: '' };
+    return result.updateCustomer || { acknowledged: false, itemId: '' };
   } catch (error) {
     throw new Error(`Failed to update customer: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -95,11 +83,7 @@ export const deleteCustomer = async (itemId: string): Promise<CustomerResponse> 
       variables: { itemId },
     });
 
-    if (result.errors && result.errors.length > 0) {
-      throw new Error(result.errors.map((e: { message: string }) => e.message).join(', '));
-    }
-
-    return result.data?.deleteCustomer || { acknowledged: false, itemId: '' };
+    return result.deleteCustomer || { acknowledged: false, itemId: '' };
   } catch (error) {
     throw new Error(`Failed to delete customer: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }

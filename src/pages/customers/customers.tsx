@@ -3,33 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
 import { Button } from 'components/ui/button';
 import { Badge } from 'components/ui/badge';
-import { Plus, User, Key } from 'lucide-react';
+import { Plus, User } from 'lucide-react';
 import { AddCustomerForm } from 'features/customers';
 import { useCustomers } from 'features/customers';
-import { getAccessTokenFromCookies } from 'features/customers';
-
-// Simple token source indicator component
-const TokenSourceIndicator: React.FC = () => {
-  const cookieToken = getAccessTokenFromCookies();
-  const envToken = process.env.REACT_APP_GRAPHQL_API_KEY;
-  
-  const getTokenSource = () => {
-    if (cookieToken) return { source: 'Cookie', variant: 'default' as const };
-    if (envToken) return { source: 'Env', variant: 'secondary' as const };
-    return { source: 'No Token', variant: 'destructive' as const };
-  };
-
-  const { source, variant } = getTokenSource();
-
-  return (
-    <div className="flex items-center gap-2">
-      <Key className="h-4 w-4 text-muted-foreground" />
-      <Badge variant={variant} className="text-xs">
-        {source}
-      </Badge>
-    </div>
-  );
-};
 
 export default function CustomersPage() {
   const { t } = useTranslation();
@@ -121,11 +97,6 @@ export default function CustomersPage() {
         onOpenChange={setIsAddingCustomer}
         onSubmit={handleAddCustomer}
       />
-
-      {/* Access Token Status Indicator - Bottom Right */}
-      <div className="flex justify-end pt-4 border-t">
-        <TokenSourceIndicator />
-      </div>
     </div>
   );
 }
